@@ -24,9 +24,30 @@ from db.models import *
 ############################################################################
 """ Replace the code below with your own """
 
-# Seed a few users in the database
-User.objects.create(name='Dan')
-User.objects.create(name='Robert')
+if Product.objects.count() == 0:
+    products = [
+        [ "1", "Apple",  0.99 ],
+        [ "2", "Banana", 0.79 ],
+        [ "3", "Chocolate", 2.49 ],
+        [ "4", "Noodles", 3.29],
+    ]
 
-for u in User.objects.all():
-    print(f'ID: {u.id} \tUsername: {u.name}')
+    for p in products:
+        Product.objects.create(upc=p[0], name=p[1], price=p[2])
+
+    print("Database filled.")
+
+else:
+    print("Database already filled.")
+
+while True:
+    user_input = input("\nEnter product UPC ('exit' to quit): ")
+    if user_input.lower() == "exit":
+        print("Exiting Application.")
+        break
+
+    try:
+        product = Product.objects.get(upc=user_input)
+        print(f"\nProduct Name: {product.name}\nProduct Price: ${product.price}")
+    except Product.DoesNotExist:
+        print("\nProduct not found. Please try again.")
