@@ -5,13 +5,11 @@ Django ORM Standalone
 ![Django](https://img.shields.io/badge/Django_ORM-Standalone-blue)
 ![Python](https://img.shields.io/badge/Python-yellow)
 
-Use the database components of Django without having to use the rest of Django (i.e. running a web server)! :tada: A typical use case for using this template would be if you are writing a python script and you would like the database functionality provided by Django, but have no need for the request/response functionalty of a client/server web application that Django also provides. 
-
-With this project template you can write regular python scripts and use Django's excellent ORM functionality with the database backend of your choice. This makes it convienient for Djangonauts to write database driven python applications with the familiar and well polished Django ORM. Enjoy.
+We used this Django ORM Standalone and edited to make our Cash Register Application. It is used to leverage its database operations. We have implemented a Product table and then made a program that populates the database and lets the user query the products using the UPC code.
 
 :gear: Requirements
 -------------------
-- Last tested successfully with Python 3.10.4 and Django 5.0.6
+- Last tested successfully with Python 3.14.0 and Django 5.2.6
 - Create venv and pip install django to import the required modules.
 
 :open_file_folder: File Structure
@@ -32,6 +30,8 @@ Think of it like a plain old python file, but now with the addition of Django's 
 
 __The db/models.py is where you configure your typical Django models.__ There is a toy user model included as a simple example. After running the migrations command in the quick setup below, a db.sqlite3 file will be generated. The settings.py file is where can swap out the sqlite3 database for another database connection, such as Postgres or AmazonRDS, if you wish. For most applications, sqlite3 will be powerful enough. But if you need to swap databases down the road, you can easily do so, which is one of the benefits of using the Django ORM. 
 
+The program is written in main.py which already has access to the products model in db/models.py. The db/models.py contains the product model and structure. The rest of the files are the regular django setup from the Django ORM Standalone.
+
 :rocket: Quick Setup
 --------------------
 Create a folder for your project on your local machine
@@ -44,7 +44,7 @@ python -m venv venv; source venv/bin/activate; pip install django
 ```
 Download this project template from GitHub
 ```
-git clone git@github.com:dancaron/Django-ORM.git; cd Django-ORM
+git clone https://github.com/OTUSOFE365025/assignment-3-django-and-energy-group-7.git; cd assignment-3-django-and-energy-group-7
 ```
 Initialize the database
 ```
@@ -55,35 +55,53 @@ Run the project
 python main.py
 ```
 
-Feel free to send pull requests if you want to improve this project.
-
 :crystal_ball: Example
 ----------------------
 After running Quick Start above: 
 
 Code in db/models.py:
 ```
-# Sample User model
-class User(models.Model):
-    name = models.CharField(max_length=50, default='Dan')
+class Product(models.Model):
+    upc = models.CharField(max_length=20, unique=True)
+    name = models.CharField(max_length=100)
+    price = models.DecimalField(max_digits=8, decimal_places=2)
 
     def __str__(self):
-        return self.name
+        return f"{self.name} (${self.price})"
 ```
 Code in main.py:
 ```
-# Seed a few users in the database
-User.objects.create(name='Dan')
-User.objects.create(name='Robert')
+if Product.objects.count() == 0:
+    products = [
+        [ "1", "Apple",  0.99 ],
+        [ "2", "Banana", 0.79 ],
+        [ "3", "Chocolate", 2.49 ],
+        [ "4", "Noodles", 3.29],
+    ]
 
-for u in User.objects.all():
-    print(f'ID: {u.id} \tUsername: {u.name}')
+    for p in products:
+        Product.objects.create(upc=p[0], name=p[1], price=p[2])
+
+    print("Database filled.")
+
+else:
+    print("Database already filled.")
+
+while True:
+    user_input = input("\nEnter product UPC ('exit' to quit): ")
+    if user_input.lower() == "exit":
+        print("Exiting Application.")
+        break
+
+    try:
+        product = Product.objects.get(upc=user_input)
+        print(f"\nProduct Name: {product.name}\nProduct Price: ${product.price}")
+    except Product.DoesNotExist:
+        print("\nProduct not found. Please try again.")
 ```
-Output from command: ```python main.py```
-```
-ID: 1	Username: Dan
-ID: 2	Username: Robert
-```
+Output from command: ```python main.py``` and user input
+
+<img width="748" height="283" alt="image" src="https://github.com/user-attachments/assets/5e32f715-7296-48fa-b4cf-d77aba59a3cb" />
 
 :mortar_board: Django Models
 ----------------------------
